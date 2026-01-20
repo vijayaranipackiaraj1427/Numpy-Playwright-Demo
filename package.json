@@ -1,0 +1,23 @@
+{
+  "name": "numpy-playwright-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vijayaranipackiaraj1427/Numpy-Playwright-Demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/vijayaranipackiaraj1427/Numpy-Playwright-Demo/issues"
+  },
+  "homepage": "https://github.com/vijayaranipackiaraj1427/Numpy-Playwright-Demo#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^25.0.9"
+  }
+}
