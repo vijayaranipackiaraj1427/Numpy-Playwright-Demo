@@ -11,13 +11,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/vijayaranipackiaraj1427/Numpy-Playwright-Demo/issues"
   },
   "homepage": "https://github.com/vijayaranipackiaraj1427/Numpy-Playwright-Demo#readme",
   "devDependencies": {
-    "@playwright/test": "^1.57.0",
-    "@types/node": "^25.0.9"
+    "@playwright/test": "^1.58.0",
+    "@types/node": "^25.0.9",
+    "playwright-bdd": "^8.4.2"
   }
 }
