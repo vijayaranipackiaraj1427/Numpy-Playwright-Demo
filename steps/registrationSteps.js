@@ -1,39 +1,103 @@
-import { createBdd } from 'playwright-bdd';
+import { createBdd } from "playwright-bdd";
 const { Given, When, Then } = createBdd();
-import { test, expect } from '@playwright/test';
-import { Register } from '../pom/Register.js';
-import { log } from 'node:console';
+import { expect } from '@playwright/test';
+import { Register } from "../pom/Register.js";
+import { Home } from '../pom/Home.js';
+import { log } from "node:console";
 
-let registerObj;
+let homePage;
+let registerPage;
+const password = 'Test@1234';
+const password_confirm = 'Test@1234';
+let username;
 
-Given('the user is on the user registration page', async ({page}) => {
-  // Step: Given the user is on the user registration page
-  // From: features/Registration.feature:7:5
-    registerObj = new Register(page);
-    await registerObj.launchPage();
+Given('the user is on the Home page', async ({ page }) => {
+  homePage = new Home(page);
+  await homePage.launchApp();
 });
 
-When('the user clicks the Register link on the Home page', async ({}) => {
-  // Step: When the user clicks the "Register" link on the Home page
-  // From: features/Registration.feature:10:5
-    await registerObj.clickRegister();
+When('the user clicks the Register link on the Home page', async ({ page }) => {
+  await homePage.clickRegister();
+  await expect(page).toHaveURL('https://dsportalapp.herokuapp.com/register');
 });
 
-Then('the user navigates to the Register form', async ({}) => {
-  // Step: Then the user navigates to the Register form
-  // From: features/Registration.feature:11:5
-    await expect(registerObj.userNameText).toBeVisible();
+Then('the user navigates to the Register form', async ({ page }) => {
+  registerPage = new Register(page);
+  username = await registerPage.generateValidUsername(12);   // dynamic username
+  console.log('User name '+ username);
+  await expect(registerPage.userNameTextBox).toBeVisible();
 });
 
-When('the user clicks the {string} button with all fields empty', async ({}, arg) => {
-  // Step: When the user clicks the "Register" button with all fields empty
-  // From: features/Registration.feature:14:5
-  console.log('the user clicks the {string} button with all fields empty');
+When('the user clicks the Register button with all fields empty', async ({ page }) => {
+  // registerPage = new Register(page);
+  await registerPage.clickRegisterButton();
 });
 
-Then('the error {string} shows under the Username box', async ({}, arg) => {
-  // Step: Then the error "Please fill out this field." shows under the Username box
-  // From: features/Registration.feature:15:5
-  console.log('the error {string} shows under the Username box');
+Then('the error Please fill out this field. shows under the Username box', async ({ }) => {
+  const message = await registerPage.getUsernameErrorMessage();
+  await expect(message).toContain('Please fill out this field.');
+});
+
+When('the user clicks the Register button after entering password and password confirmation with the username field empty', async ({ page }) => {
+  // registerPage = new Register(page);
+  await registerPage.fillUsername('');
+  await registerPage.fillPasswordFields(password, 'gdfhfjh');
+  await registerPage.clickRegisterButton();
+});
+
+Then('the error Please fill out this field. shows under the Username box1', async ({ }) => {
+  const message = await registerPage.getUsernameErrorMessage();
+  await expect(message).toContain('Please fill out this field.');
+});
+
+When('the user clicks the Register button after entering username and password with the password confirmation field empty', async ({ page }) => {
+  // registerPage = new Register(page);
+  await registerPage.fillUsername(username);
+  await registerPage.fillPasswordFields(password, '');
+  await registerPage.clickRegisterButton();
+});
+
+
+Then('the error Please fill out this field. shows under the password confirmation box', async ({}) => {
+  const message = await registerPage.getPasswordConfirmErrorMessage();
+  await expect(message).toContain('Please fill out this field.');
+});
+
+When('the user clicks the Register button after entering a username containing space characters and invalid symbols other than digits and @\\/.\\/+\\/-\\/_', async ({page}) => {
+  //  registerPage = new Register(page);
+  await registerPage.fillUsername('viji #12');
+  await registerPage.fillPasswordFields(password,password_confirm);
+  await registerPage.clickRegisterButton();
+});
+
+Then('the error Please fill out this field. shows under the Password box', async ({}) => {
+  await expect(registerPage.pwdMismatchError).toBeVisible();
+});
+
+When('the user clicks the Register button after entering username and mismatched passwords in the password and password confirmation fields', async ({ page }) => {
+  // registerPage = new Register(page);
+  await registerPage.fillUsername(username);
+  await registerPage.fillPasswordFields(password, 'jkkuuji');
+});
+
+Then('the user sees the warning password_mismatch: The two password fields didn’t match.', async ({}) => {
+  await expect(registerPage.pwdMismatchError).toBeVisible();
+});
+
+When('the user clicks the Register button after entering valid username, password, and password confirmation in their respective fields', async ({page}) => {
+  //  registerPage = new Register(page);
+  console.log('User name '+ username);
+  console.log('password '+ password);
+  console.log('password_confirm '+ password_confirm);
+  await registerPage.fillUsername(username);
+  await registerPage.fillPasswordFields(password, password_confirm);
+  await registerPage.clickRegisterButton();
+});
+
+Then('the user goes to the DS Algo Home Page with the message New Account Created. You are logged in as <ID>', async ({ page }) => {
+await expect(
+  page.locator('.alert').getByText(/You are logged in as/i)
+).toBeVisible();
+
 });
 
